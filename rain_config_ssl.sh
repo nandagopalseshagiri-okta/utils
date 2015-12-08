@@ -81,9 +81,9 @@ echo
 echo "Now need sudo permission to run haproxy"
 echo
 
-if [ ! -e $pcre_loc/lib/libpcre.1.dylib ]
+if [ ! -e /usr/local/lib/libpcre.1.dylib ]
 	then
-	echo $pcre_loc/lib/libpcre.1.dylib does not exist. Will link.
+	echo /usr/local/lib/libpcre.1.dylib does not exist. Will link to $pcre_loc/lib/libpcre.1.dylib
 	sudo ln -s $pcre_loc/lib/libpcre.1.dylib /usr/local/lib/libpcre.1.dylib
 fi
 
