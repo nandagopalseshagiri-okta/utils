@@ -95,14 +95,3 @@ if [ "$3" != "-config_push" ]
 	exit 0
 fi
 
-wireless_ip=$(ifconfig en0 | grep "inet " | cut -d' ' -f2)
-echo "wireless_ip = $wireless_ip"
-
-temp_host_file=$(mktemp -t changed_etc_hosts)
-cat /etc/hosts | grep -v "rain\(-admin\)\?.okta1.com" > $temp_host_file
-echo $wireless_ip rain.okta1.com >> $temp_host_file
-echo $wireless_ip rain-admin.okta1.com >> $temp_host_file
-
-echo $temp_host_file
-
-# # change /etc/hosts to make rain.okta1.com and rain-admin.okta1.com point to the non-loopback IP
