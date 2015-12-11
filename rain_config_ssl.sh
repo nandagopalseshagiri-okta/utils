@@ -72,6 +72,7 @@ tomcat_has_changes=$(cat $OKTA_HOME/thirdparty/tomcat/6.0.35/shared/classes/env.
 if [ "$tomcat_has_changes" == "" ]
 	then
 	echo **** Changing tomcat settings ****
+	echo >> $OKTA_HOME/thirdparty/tomcat/6.0.35/shared/classes/env.properties
 	echo serverProtocol=https >> $OKTA_HOME/thirdparty/tomcat/6.0.35/shared/classes/env.properties
 	echo serverPort=443 >> $OKTA_HOME/thirdparty/tomcat/6.0.35/shared/classes/env.properties
 fi
