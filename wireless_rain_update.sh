@@ -24,9 +24,15 @@ fi
 sudo rm /etc/hosts.old 2> /dev/null > /dev/null
 sudo cp /etc/hosts /etc/hosts.old
 sudo mv $temp_host_file /etc/hosts
+sudo chown root /etc/hosts
+sudo chmod 0644 /etc/hosts
+
+dnsmasq_log=$(mktemp -t dnsmasq_log)
+touch $dnsmasq_log
+echo "dnsmasq loggin into file $dnsmasq_log"
 
 dnsmasq_loc=$(brew_package_location dnsmasq)
-sudo $dnsmasq_loc/sbin/dnsmasq
+sudo $dnsmasq_loc/sbin/dnsmasq --cache-size=0 -q --log-facility=$dnsmasq_log
 
 echo "Sleeping for few minutes to allow dnsmasq to pick up host file change before reverting to old ..."
 sleep 3
