@@ -15,6 +15,15 @@ if [ ! -e $2 ]
 	exit 2
 fi
 
+LOGGING=
+
+if [ "$3" == "-log" ]
+   then
+   LOGGING="option httplog
+   log 127.0.0.1 local5 debug"
+
+fi
+
 function brew_package_location() {
 	echo `brew info $1 | grep -m 1 \/usr | cut -d ' ' -f1`
 }
@@ -46,10 +55,12 @@ cat > $ha_proxy_config << EOF
 frontend www-http
    bind 0.0.0.0:80 ssl crt okta1.pem
    default_backend www-backend
+   $LOGGING
 frontend www-https
    bind 0.0.0.0:443 ssl crt okta1.pem
    reqadd X-Forwarded-Proto:\ https
    default_backend www-backend
+   $LOGGING
 backend www-backend
    server www-1 127.0.0.1:1802
 EOF
