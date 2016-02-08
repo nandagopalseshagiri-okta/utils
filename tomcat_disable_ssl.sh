@@ -1,29 +1,40 @@
 #!/bin/bash
 
 command=disable_ssl
-if [ "$1" == "-e" ]
+tomcat_prop_file=$OKTA_HOME/thirdparty/tomcat/6.0.35/shared/classes/env.properties
+outfile="$tomcat_prop_file.bk"
+tomcat_restart=1
+
+while [[ $# -ge 1 ]]
+do
+key="$1"
+echo $key
+case $key in
+    -e|--enable)
+    command=enable_ssl
+    ;;
+    -n|--notomcatrestart)
+	tomcat_restart=0
+    ;;
+    -in|--usestdin)
+    tomcat_prop_file=
+    ;;
+    -out|--usestdout)
+    outfile="$2"
+    shift
+    ;;
+    *)
+            # unknown option
+    ;;
+esac
+shift # past argument or value
+done
+
+if [ "$command" == "enable_ssl" ]
 	then
 	echo "enabling tomcat for ssl" >&2
-	command=enable_ssl
 else
 	echo "disabling ssl tomcat config. use -e to enable it" >&2
-fi
-
-tomcat_prop_file=$OKTA_HOME/thirdparty/tomcat/6.0.35/shared/classes/env.properties
-
-if [ "$2" == "stdin" ]
-	then
-	tomcat_prop_file=
-fi
-
-outfile="$tomcat_prop_file.bk"
-
-if [ "$3" == "stdout" ]
-	then
-	outfile=
-elif [ "$3" != "" ]
-	then
-	outfile="$3"
 fi
 
 disable_ssl() {	
@@ -87,7 +98,13 @@ enable_ssl() {
 	}'
 }
 
-ant smoke.tomcat >&2
+if [ "$tomcat_restart" == "1" ]
+	then
+	pushd $OKTA_HOME/okta-core
+	ant smoke.tomcat >&2
+	popd
+fi
+
 if [ "$outfile" == "" ]
 	then
 	$command
@@ -96,4 +113,9 @@ else
 	mv $outfile $tomcat_prop_file
 fi
 
-ant start.tomcat.debug.async >&2
+if [ "$tomcat_restart" == "1" ]
+	then
+	pushd $OKTA_HOME/okta-core
+	ant start.tomcat.debug.async >&2
+	popd
+fi

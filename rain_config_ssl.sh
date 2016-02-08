@@ -79,15 +79,7 @@ popd
 
 haproxy_loc=$(brew_package_location haproxy)
 
-tomcat_has_changes=$(cat $OKTA_HOME/thirdparty/tomcat/6.0.35/shared/classes/env.properties | grep '^[^#].*$' | grep serverProtocol)
-if [ "$tomcat_has_changes" == "" ]
-	then
-	echo **** Changing tomcat settings ****
-	echo  >> $OKTA_HOME/thirdparty/tomcat/6.0.35/shared/classes/env.properties
-	echo serverProtocol=https >> $OKTA_HOME/thirdparty/tomcat/6.0.35/shared/classes/env.properties
-	echo serverPort=443 >> $OKTA_HOME/thirdparty/tomcat/6.0.35/shared/classes/env.properties
-	echo  >> $OKTA_HOME/thirdparty/tomcat/6.0.35/shared/classes/env.properties
-fi
+ ./tomcat_disable_ssl.sh -e
 
 echo "******************************************************"
 echo
