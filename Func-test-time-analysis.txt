@@ -1,0 +1,9 @@
+Func test time consumers
+
+40517 [ 21-09-2016 13:37:29 ] [main] [  INFO ] [ Jaxb2Marshaller ] - Creating JAXBContext with classes to be bound [class com.saasure.applicati      on.activedirectory.api.ActiveDirectorySummary,class com.saasure.application.activedirectory.api.ActiveDirectoryAgentSummary,class com.saa      sure.application.activedirectory.api.ActionWrapper,class com.saasure.application.activedirectory.api.IwaSsoConfigSettings,class com.saasu      re.application.activedirectory.api.legacy.AgentAction,class com.saasure.application.activedirectory.api.legacy.ConfigAction,class com.saa      sure.application.activedirectory.api.legacy.InitAction,class com.saasure.application.activedirectory.api.legacy.UserAuthAction,class com.      saasure.application.activedirectory.api.legacy.ScanAllAction,class com.saasure.application.activedirectory.api.legacy.PasswordResetAction      ,class com.saasure.application.activedirectory.api.legacy.NoneAction,class com.saasure.application.activedirectory.api.legacy.DirectoryIn      vokeAction,class com.saasure.application.activedirectory.api.AgentConfig,class com.saasure.application.activedirectory.api.ActiveDirector      yAgentLogsArchiveUploaded]
+40518 [ 21-09-2016 13:37:40 ] [main] [  INFO ] [ CustomSessionFactoryBean ] - Building new Hibernate SessionFactory
+
+The Jaxb2Marshaller hogs the CPU for about 10-11 seconds
+
+The main threa which is setting up the spring context takes about 1 min and 20 seconds to setup.
+
