@@ -1,9 +1,19 @@
 Func test time consumers
+=========================
 
 40517 [ 21-09-2016 13:37:29 ] [main] [  INFO ] [ Jaxb2Marshaller ] - Creating JAXBContext with classes to be bound [class com.saasure.applicati      on.activedirectory.api.ActiveDirectorySummary,class com.saasure.application.activedirectory.api.ActiveDirectoryAgentSummary,class com.saa      sure.application.activedirectory.api.ActionWrapper,class com.saasure.application.activedirectory.api.IwaSsoConfigSettings,class com.saasu      re.application.activedirectory.api.legacy.AgentAction,class com.saasure.application.activedirectory.api.legacy.ConfigAction,class com.saa      sure.application.activedirectory.api.legacy.InitAction,class com.saasure.application.activedirectory.api.legacy.UserAuthAction,class com.      saasure.application.activedirectory.api.legacy.ScanAllAction,class com.saasure.application.activedirectory.api.legacy.PasswordResetAction      ,class com.saasure.application.activedirectory.api.legacy.NoneAction,class com.saasure.application.activedirectory.api.legacy.DirectoryIn      vokeAction,class com.saasure.application.activedirectory.api.AgentConfig,class com.saasure.application.activedirectory.api.ActiveDirector      yAgentLogsArchiveUploaded]
 40518 [ 21-09-2016 13:37:40 ] [main] [  INFO ] [ CustomSessionFactoryBean ] - Building new Hibernate SessionFactory
 
-The Jaxb2Marshaller hogs the CPU for about 10-11 seconds
+* The Jaxb2Marshaller hogs the CPU for about 10-11 seconds
 
-The main threa which is setting up the spring context takes about 1 min and 20 seconds to setup.
+* The main threa which is setting up the spring context takes about 1 min and 20 seconds to setup.
 
+[ 20-09-2016 18:48:24 ] [main] [  INFO ] [ ServerStatusAwareDataSource ] - Starting hsEntityDataSource in ACTIVE
+[ 20-09-2016 18:48:36 ] [main] [  INFO ] [ CustomSessionFactoryBean ] - Building new Hibernate SessionFactory
+
+* From that log it looks like something between ServerStatusAwareDataSource and CustomSessionFactoryBean takes about 12 seconds.
+
+[ 20-09-2016 18:49:05 ] [main] [  INFO ] [ MBeanExporter ] - Bean with name 'idpTransactionManager' has been autodetected for JMX exposure
+[ 20-09-2016 18:49:46 ] [main] [  INFO ] [ MBeanExporter ] - Bean with name 'jwtService' has been autodetected for JMX exposure
+
+* And JMX exposure takes about 30 seconds too
