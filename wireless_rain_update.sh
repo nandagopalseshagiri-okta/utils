@@ -4,7 +4,26 @@ function brew_package_location() {
 	echo `brew info $1 | grep -m 1 \/usr | cut -d ' ' -f1`
 }
 
-wireless_ip=$(ifconfig en0 | grep "inet " | cut -d' ' -f2)
+read -n1 -p "Is rain built in Albatross or on your host? [a/h] > " albatross
+
+wireless_ip=''
+case $albatross in
+	a|A)
+		echo -e "\nUsing albatross' IP address..."
+		running_vms="$(/Applications/VMware\ Fusion.app/Contents/Library/vmrun list)"
+		vm_path=$(echo ${running_vms} | awk -F'1 ' {'print $2'})
+		wireless_ip="$(/Applications/VMware\ Fusion.app/Contents/Library/vmrun getGuestIPAddress "${vm_path}")"
+		;;
+	h|H)
+		echo -e "\nUsing host machine's IP address..."
+		wireless_ip=$(ifconfig en0 | grep "inet " | cut -d' ' -f2)
+		;;
+	*)
+		echo -e "\nInvalid response"
+		exit 2
+		;;
+esac
+
 echo "wireless_ip = $wireless_ip"
 
 temp_host_file=$(mktemp -t changed_etc_hosts)

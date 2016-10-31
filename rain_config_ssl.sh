@@ -24,31 +24,75 @@ if [ "$3" == "-log" ]
 
 fi
 
+function pkg_loc() {
+	if [ `uname` = "Linux" ]
+		then
+		echo $(yum_package_location $1)
+	elif [ `uname` = "Darwin" ]
+		then
+		echo $(brew_package_location $1)
+	else
+		echo "Unsupported operating system"
+		exit 1
+	fi
+}
+
+function yum_package_location() {
+	echo `rpm -ql $1`
+}
+
 function brew_package_location() {
 	echo `brew info $1 | grep -m 1 \/usr | cut -d ' ' -f1`
+}
+
+function yum_package_installed() {
+	package_installed=$(yum_package_location $1 | awk -F'is ' {'print $2'})
+	if [ "$package_installed" = "not installed" ]; then echo false; else echo true; fi
+}
+
+function brew_package_installed() {
+	package_installed=$(brew_package_location $1)
+	if [ "$package_installed" = "" ]; then echo false; else echo true; fi
+}
+
+function install_package() {
+	if [ `uname` = "Linux" ]
+		then
+		if [ "$(yum_package_installed $1)" = "false" ]
+			then echo "Installing $1"; sudo yum install $1;
+			if [ "$(yum_package_installed $1)" = "false" ]; then echo "$1 install failed"; exit 1; fi
+		else
+			echo "$1 is already installed"
+		fi
+	elif [ `uname` = "Darwin" ]
+		then
+		if [ "$(brew_package_installed $1)" = "false" ]
+			then echo " Installing $1"; brew install $1;
+			if [ "$(brew_package_installed $1)" = "false" ]; then echo "$1 install failed"; exit 1; fi
+		else
+			echo "$1 is already installed"
+		fi
+	else
+		echo "Unsupported operating system"
+		exit 1
+	fi
 }
 
 packages="haproxy
 pcre
 dnsmasq"
 
-#brew install the packages
-
 for package in $packages
 do
-brew install $package
-package_loc=$(brew_package_location $package)
-
-if [ $? -ne 0 ]; then echo "$package install failed"; exit 1; fi
-echo $package_loc
+install_package $package
 done
 
 echo
-echo 
+echo
 
-pcre_loc=$(brew_package_location pcre)
+rm -r haproxy*
 
-ha_proxy_config=$(mktemp -t ha_proxy_config)
+ha_proxy_config=$(mktemp -t ha_proxy_configXXXXXX)
 echo $ha_proxy_config is the ha ha_proxy_config
 
 cat > $ha_proxy_config << EOF 
@@ -65,7 +109,7 @@ backend www-backend
    server www-1 127.0.0.1:1802
 EOF
 
-haconfig_dir=$(mktemp -d -t haproxy_config)
+haconfig_dir=$(mktemp -d -t haproxy_configXXXXX)
 echo $haconfig_dir
 mv $haconfig_dir .
 haconfig_dir_name=$(basename "$haconfig_dir")
@@ -77,7 +121,9 @@ cd STAR*
 cat STAR_okta1_com.crt COMODORSADomainValidationSecureServerCA.crt COMODORSAAddTrustCA.crt AddTrustExternalCARoot.crt star.okta1.com.key > ../okta1.pem
 popd
 
-haproxy_loc=$(brew_package_location haproxy)
+haproxy_loc=''
+if [ `uname` = "Linux" ]; then haproxy_loc='/usr/sbin/haproxy';
+else haproxy_loc="$(brew_package_location haproxy)/bin/haproxy"; fi
 
  ./tomcat_disable_ssl.sh -e
 
@@ -86,17 +132,10 @@ echo
 echo "Now need sudo permission to run haproxy"
 echo
 
-if [ ! -e /usr/local/lib/libpcre.1.dylib ]
-	then
-	echo /usr/local/lib/libpcre.1.dylib does not exist. Will link to $pcre_loc/lib/libpcre.1.dylib
-	sudo ln -s $pcre_loc/lib/libpcre.1.dylib /usr/local/lib/libpcre.1.dylib
-fi
-
 cd $haconfig_dir_name
-sudo $haproxy_loc/bin/haproxy -f ./$(basename "$ha_proxy_config")
+sudo $haproxy_loc -f ./$(basename "$ha_proxy_config")
 
 if [ "$3" != "-config_push" ]
 	then
 	exit 0
 fi
-
