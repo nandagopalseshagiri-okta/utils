@@ -5,10 +5,10 @@ program
 	.parse(process.argv);
 
 var port = program.port || 8124;
-var remote = program.remote.toString().split(':');
+var remote = program.remote != null ? program.remote.toString().split(':') : [];
 if (remote.length != 2 || parseInt(remote[1]) <= 0) {
 	console.log('please specify a remote host to pipe to');
-	program.exit();
+	process.exit(1);
 }
 
 console.log('listening on port ' + port);
