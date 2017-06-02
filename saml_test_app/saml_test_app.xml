@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?><md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="http://www.okta.com/exknqbsBoUZyfLklo0g3"><md:IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><md:KeyDescriptor use="signing"><ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:X509Data><ds:X509Certificate>MIIDvTCCAqWgAwIBAgIERoPxeDANBgkqhkiG9w0BAQUFADCBjjELMAkGA1UEBhMCVVMxEzARBgNV
+BAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBGcmFuY3NpY28xDTALBgNVBAoTBE9rdGExFDAS
+BgNVBAsTC1NTT1Byb3ZpZGVyMS0wKwYDVQQDDCRib290c3RyYXAvZW1haWxBZGRyZXNzPWluZm9A
+b2t0YS5jb20wHhcNMTUwMjA5MTc1MDMxWhcNNDUwMjA4MTc1MDMxWjCBjjELMAkGA1UEBhMCVVMx
+EzARBgNVBAgTCkNhbGlmb3JuaWExFjAUBgNVBAcTDVNhbiBGcmFuY3NpY28xDTALBgNVBAoTBE9r
+dGExFDASBgNVBAsTC1NTT1Byb3ZpZGVyMS0wKwYDVQQDDCRib290c3RyYXAvZW1haWxBZGRyZXNz
+PWluZm9Ab2t0YS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCG1uLkfkw3+hho
+pxny+VZFmfahOs9jS/z/YGv9Vk8mAnnt0KCC6rl0OTUx79rH4HeSME91dxbzAShQVpTfSynJV5CN
+mt2qxK8XScxbg7Osw4iqsYvAKsCgMFLy261+Tljupz7nEAHPGC7gGOBIrmdZdsK39RHQPNVOSei2
+YwZ5Py0B6PwXoYCmEtrRiEjFZPsnL7L+l0A2yJQ9GJkGgu54YjSusKqBgchBWM2iPj6yLXTkoJdt
+C7Jgz38J353LK7konghzRw5brWCnHimd5wyBLLw5fnsUR3TpbaETEF3j1qHqOtrYoUx44Z7euQhe
+Kt2Sh+XWYGB5Dvuu4o7XBb1DAgMBAAGjITAfMB0GA1UdDgQWBBTA0lR8MLwC7BMTTMwkHUNAIdax
+ADANBgkqhkiG9w0BAQUFAAOCAQEAXI/fsVZIi1vtBRt3d5e7KZQ+X8jPYcroAFNYNaC7i5EYzrnT
+IjD30aV30iGJb6Z2PBoa9O05j343i/SBuBvQhMjdOSd48jJW2afdxwadfjG8Ils4gG015Ey16fw/
+yv5y+jkUD73Ayt0QTpD/ZisK2emvhndeBRoMdzH8YD/srX5mDcm8uIN/pIiFsWYt6T9nSWEmMuLK
+bdohmNBkEjLyU2F9lfXXtBnLkUuvzmKogOE0UNzTGjndBalPKu1JwzVNUJxhekmFh0rVOqEstgBO
+lcO6dqIatY7IVaMJ1v0rtZcYvN0TEb3TPupS/wxyU48uJLOPltwDsj5xatOzvA/Kzw==</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://rain.okta1.com:1802/app/raincloud59_testsamlsp_1/exknqbsBoUZyfLklo0g3/sso/saml"/><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://rain.okta1.com:1802/app/raincloud59_testsamlsp_1/exknqbsBoUZyfLklo0g3/sso/saml"/></md:IDPSSODescriptor></md:EntityDescriptor>
