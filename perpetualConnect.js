@@ -32,6 +32,10 @@ function connect(remote, ondata, onconnect) {
       console.log('Reacting to data arrival');
       ondata(data, rm) };
   });
+  rm.on('end', function () {
+    console.log('connection ended - starting one more connection');
+    connectRight();
+  });
 }
 
 function connectRight() {
