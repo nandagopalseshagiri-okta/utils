@@ -72,9 +72,9 @@ haconfig_dir_name=$(basename "$haconfig_dir")
 
 pushd $haconfig_dir_name
 mv $ha_proxy_config .
-unzip -q $2
-cd STAR*
-cat STAR_okta1_com.crt COMODORSADomainValidationSecureServerCA.crt COMODORSAAddTrustCA.crt AddTrustExternalCARoot.crt star.okta1.com.key > ../okta1.pem
+unzip -q $2 -d STAR_extracted
+cd STAR_extracted
+cat STAR_okta1_com.crt star.okta1.com.chain star.okta1.com.key > ../okta1.pem
 popd
 
 haproxy_loc=$(brew_package_location haproxy)

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 command=disable_ssl
-tomcat_prop_file=$OKTA_HOME/thirdparty/tomcat/6.0.35/shared/classes/env.properties
+tomcat_prop_file=$OKTA_HOME/thirdparty/tomcat/6.0.35.java8/shared/classes/env.properties
 outfile="$tomcat_prop_file.bk"
 tomcat_restart=1
 
