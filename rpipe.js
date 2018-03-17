@@ -42,6 +42,8 @@ function pickAndJoinConnectionFromQueueOrWait(queue, rc, count) {
   if (queue.length <= 0) {
     if (count >= MAX_WAIT_COUNT) {
       console.log('[RIGHT] reached/exceeded max wait count waiting for left connection. waitCount = ' + count);
+      rc.close();
+      return;
     }
     setTimeout(pickAndJoinConnectionFromQueueOrWait, 1000, queue, rc, ++count);
     return;
