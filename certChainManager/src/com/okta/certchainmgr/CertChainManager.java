@@ -1,10 +1,14 @@
 package com.okta.certchainmgr;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -15,6 +19,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class CertChainManager {
+    private Map<String, List<X509Certificate>> certs = new HashMap<>();
+    private Map<String, List<X509Certificate>> rootCerts = new HashMap<>();
+    private Map<String, List<X509Certificate>> byIssuers = new HashMap<>();
+    private Map<String, X509Certificate> certByHashes = new HashMap<>();
+
     public class LoadResult {
         public List<String> chainHeads;
         public int ingnoredLeafCertCount;
@@ -42,6 +51,7 @@ public class CertChainManager {
         private List<List<X509Certificate>> chains = new ArrayList<>();
         private Map<String, List<List<X509Certificate>>> chainTopOpenEnd = new HashMap<>();
         private Map<String, List<List<X509Certificate>>> chainBottomOpenEnd = new HashMap<>();
+        private int ignoredLeaves = 0;
 
         public List<List<X509Certificate>> getChains() {
             return chains;
@@ -112,6 +122,14 @@ public class CertChainManager {
             chainBottomOpenEnd.putIfAbsent(key, new ArrayList<>());
             chainBottomOpenEnd.get(key).add(chain);
         }
+
+        public int getIgnoredLeaves() {
+            return ignoredLeaves;
+        }
+
+        public void incrementIgnoredLeaves(int ignoredLeaves) {
+            this.ignoredLeaves += ignoredLeaves;
+        }
     }
 
     public LoadResult loadCertChains(String filePath) {
@@ -125,16 +143,27 @@ public class CertChainManager {
     }
 
     public LoadResult loadCertChains(InputStream inputStream) {
+        CertChainBuilder certChainBuilder = makeOrAddToCertChainBuilder(inputStream, null);
+        List<String> chainHeads = new ArrayList<>();
+        certChainBuilder.getFullChains().stream().forEach((lc) -> {
+            lc.stream().findFirst().map(c -> c.getSubjectDN().toString()).map(s -> chainHeads.add(s));
+        });
+        return new LoadResult(chainHeads, certChainBuilder.getIgnoredLeaves(), certChainBuilder.getChains().size() - certChainBuilder.getFullChains().size());
+    }
+
+    public CertChainBuilder makeOrAddToCertChainBuilder(InputStream inputStream, CertChainBuilder certChainBuilderOrNull) {
         int count = 0;
-        Map<String, List<X509Certificate>> certs = new HashMap<>();
-        Map<String, List<X509Certificate>> rootCerts = new HashMap<>();
-        Map<String, List<X509Certificate>> byIssuers = new HashMap<>();
         int ignoredLeaves = 0;
         try {
             BufferedInputStream bis = new BufferedInputStream(inputStream);
             while (bis.available() > 0) {
                 X509Certificate cert = readCert(bis);
                 count++;
+                String sha256 = sha256(cert);
+                if (certByHashes.containsKey(sha256)) {
+                    continue;
+                }
+                certByHashes.put(sha256, cert);
                 if (cert.getBasicConstraints() < 0) {
                     ignoredLeaves++;
                     continue;
@@ -146,7 +175,7 @@ public class CertChainManager {
                 throw new CCException("At least one root cert should be present", null);
             }
 
-            CertChainBuilder certChainBuilder = new CertChainBuilder();
+            CertChainBuilder certChainBuilder = certChainBuilderOrNull != null? certChainBuilderOrNull : new CertChainBuilder();
 
             rootCerts.values().stream().forEach((lc) -> {
                 lc.stream().forEach((c) -> certChainBuilder.addCert(c));
@@ -155,15 +184,14 @@ public class CertChainManager {
                 lc.stream().forEach(((c) -> certChainBuilder.addCert(c)));
             });
 
-            List<String> chainHeads = new ArrayList<>();
-            certChainBuilder.getFullChains().stream().forEach((lc) -> {
-                lc.stream().findFirst().map(c -> c.getSubjectDN().toString()).map(s -> chainHeads.add(s));
-            });
-            return new LoadResult(chainHeads, ignoredLeaves, certChainBuilder.getChains().size() - certChainBuilder.getFullChains().size());
+            certChainBuilder.incrementIgnoredLeaves(ignoredLeaves);
+            return certChainBuilder;
         } catch (CertificateException e) {
             throw new CCException(String.format("Error %1$s loading cert # %$2d", e.getMessage(), count), e);
         } catch (IOException e) {
             throw new CCException("IO Error " + e.getMessage(), e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new CCException("Crypto Algo no available " + e.getMessage(), e);
         }
     }
 
@@ -183,6 +211,12 @@ public class CertChainManager {
 
     private boolean isCertRoot(X509Certificate certificate) {
         return certificate != null && certificate.getBasicConstraints() > 0 && certificate.getSubjectDN().equals(certificate.getIssuerDN());
+    }
+
+    private String sha256(X509Certificate cert) throws NoSuchAlgorithmException, CertificateEncodingException {
+        return DatatypeConverter.printHexBinary(
+                MessageDigest.getInstance("SHA-256").digest(
+                        cert.getEncoded())).toLowerCase();
     }
 
     private void matchAkid() {
